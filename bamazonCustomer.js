@@ -1,5 +1,7 @@
 var mysql = require("mysql");
 require("dotenv").config();
+var readlineSync = require('readline-sync');
+const readline = require('readline');
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -22,11 +24,31 @@ connection.connect(function(err) {
 });
 
 function createProduct() {
-  console.log("Everything is going well!");
-  connection.query("SELECT * FROM products",
-    function(err,res){
-        if (err) throw err;
-        console.log(res);
-    })
-  connection.end();
+  console.log("Welcome to the Potterless kiosk! Here are the items that we sell: ");
+//   connection.query("SELECT * FROM products",
+//     function(err,res){
+//         if (err) throw err;
+//         console.log(res);
+//     })
+    getInput();
+};
+
+function getInput(){
+    options=['put-outer', 'extendable ears', 'Love potions', 'Nimbus 2000', 'quaffels', 'The Marauders Map', 'toothflossing stringmints', 'Bertie Botts Every Flavour Beans','butterbeer','lemon drops'],
+    index = readlineSync.keyInSelect(options, "Which product would you like to purchase?");
+    var itemOrdered=options[index];
+    console.log("Here is what you are ordering ->", itemOrdered);
+    const readline = require('readline');
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    rl.question('How much of this product would you like to order? ', (answer) => {
+        var quantityOrdered = answer;
+        console.log("You would like this quantity ->", quantityOrdered);
+        console.log(`You would like ${answer} unit(s) of `+ itemOrdered);
+    rl.close();
+
+    connection.end();
+});
 }
