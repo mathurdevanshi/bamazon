@@ -25,12 +25,13 @@ connection.connect(function(err) {
 
 function createProduct() {
   console.log("Welcome to the Potterless kiosk! Here are the items that we sell: ");
-//   connection.query("SELECT * FROM products",
-//     function(err,res){
-//         if (err) throw err;
-//         console.log(res);
-//     })
-    getInput();
+  connection.query("SELECT * FROM products",
+    function(err,res){
+        if (err) throw err;
+        console.log(res);
+        getInput();
+    })
+    
 };
 
 function getInput(){
@@ -49,6 +50,50 @@ function getInput(){
         console.log(`You would like ${answer} unit(s) of `+ itemOrdered);
     rl.close();
 
-    connection.end();
+    checkValues(itemOrdered, quantityOrdered)
+    
 });
+}
+
+function checkValues(itemOrdered, quantityOrdered){
+    var stockQuantity;
+    theQuery="Select stock_quantity FROM products WHERE product_name = " + "'" + itemOrdered + "'";
+    connection.query(theQuery,
+    function(err,res){
+        if (err) throw err;
+        console.log(res);
+        stockQuantity=res;
+        console.log("stockQuantity",stockQuantity);
+        console.log("quanitityOrdered", quantityOrdered);
+        console.log("theQuery ", theQuery);
+        updateValues(stockQuantity, itemOrdered, quantityOrdered);
+    })
+   
+}
+
+function updateValues(stockQuantity, itemOrdered, quanitityOrdered){
+    console.log("stockQuantity = ", stockQuantity);
+    console.log("itemOrdered = ", itemOrdered);
+    console.log("quantityOrdered = ", quanitityOrdered);
+
+    // if (quantityOrdered<stockQuantity){
+    //     console.log("Sorry, we do not have enough stock to place this order.");
+    //     console.log("You have ordered " + quantityOrdered + " units, and we only have " + stockQuantity + " in our stock. Try either updating your order or ordering something else.");
+    //     getInput();
+    // }
+    // else{
+    //      var newTotal = stockQuantity - quantityOrdered;
+            // var theQuery = "UPDATE products SET stock_quantity =" + newTotal + "WHERE stock_quantity = " + stockQuantity;
+            // con.connect(function(err) {
+            //     if (err) throw err;
+            //     var sql = theQuery;
+            //     con.query(sql, function (err, result) {
+            //     if (err) throw err;
+            //     console.log(result.affectedRows + " record(s) updated");
+            //     });
+            // });
+    // }
+
+
+    connection.end();
 }
