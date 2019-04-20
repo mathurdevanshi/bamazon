@@ -92,6 +92,14 @@ function updateValues(stockQuantity, itemOrdered, quanitityOrdered){
             //     console.log(result.affectedRows + " record(s) updated");
             //     });
             // });
+    //         console.log("The new stockQuantity is ", stockQuantity);
+    //         console.log("The updated JSON is as follows: ");
+    //         connection.query("SELECT * FROM products",
+    //             function(err,res){
+    //                 if (err) throw err;
+    //                 console.log(res);
+    // })
+
     // }
 
 
