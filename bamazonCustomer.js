@@ -8,7 +8,7 @@ var connection = mysql.createConnection({
 
   // Your port; if not 3306
   port: 3306,
-
+      
   // Your username
   user: process.env.WEBSITE_USER,
 
@@ -19,23 +19,28 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadId + "\n");
   createProduct();
 });
 
 function createProduct() {
+  console.log("********************************************************************")  
   console.log("Welcome to the Potterless kiosk! Here are the items that we sell: ");
+  console.log("********************************************************************")  
   connection.query("SELECT * FROM products",
     function(err,res){
         if (err) throw err;
         console.log(res);
+        console.log("********************************************************************")  
         getInput();
     })
     
 };
 
 function getInput(){
-    options=['put-outer', 'extendable ears', 'Love potions', 'Nimbus 2000', 'quaffels', 'The Marauders Map', 'toothflossing stringmints', 'Bertie Botts Every Flavour Beans','butterbeer','lemon drops'],
+    console.log("Choose from one of the following items you saw above by typing the number next to it.")
+    console.log("********************************************************************")  
+
+    options=['put-outter', 'extendable ears', 'Love potions', 'Nimbus 2000', 'quaffels', 'The Marauders Map', 'toothflossing stringmints', 'Bertie Botts Every Flavour Beans','butterbeer','lemon drops'],
     index = readlineSync.keyInSelect(options, "Which product would you like to purchase?");
     var itemOrdered=options[index];
     console.log("Here is what you are ordering ->", itemOrdered);
@@ -46,7 +51,6 @@ function getInput(){
     });
     rl.question('How much of this product would you like to order? ', (answer) => {
         var quantityOrdered = answer;
-        console.log("You would like this quantity ->", quantityOrdered);
         console.log(`You would like ${answer} unit(s) of `+ itemOrdered);
     rl.close();
 
@@ -61,47 +65,46 @@ function checkValues(itemOrdered, quantityOrdered){
     connection.query(theQuery,
     function(err,res){
         if (err) throw err;
-        console.log(res);
-        stockQuantity=res;
-        console.log("stockQuantity",stockQuantity);
-        console.log("quanitityOrdered", quantityOrdered);
-        console.log("theQuery ", theQuery);
+        stockQuantity=res[0].stock_quantity;
         updateValues(stockQuantity, itemOrdered, quantityOrdered);
     })
    
 }
 
-function updateValues(stockQuantity, itemOrdered, quanitityOrdered){
-    console.log("stockQuantity = ", stockQuantity);
-    console.log("itemOrdered = ", itemOrdered);
-    console.log("quantityOrdered = ", quanitityOrdered);
+function updateValues(stock_Quantity, item_Ordered, quanitity_Ordered){
+    
+    var stockQuantity =stock_Quantity;
+    var itemOrdered = item_Ordered;
+    var quanitityOrdered= quanitity_Ordered;
 
-    // if (quantityOrdered<stockQuantity){
-    //     console.log("Sorry, we do not have enough stock to place this order.");
-    //     console.log("You have ordered " + quantityOrdered + " units, and we only have " + stockQuantity + " in our stock. Try either updating your order or ordering something else.");
-    //     getInput();
-    // }
-    // else{
-    //      var newTotal = stockQuantity - quantityOrdered;
-            // var theQuery = "UPDATE products SET stock_quantity =" + newTotal + "WHERE stock_quantity = " + stockQuantity;
-            // con.connect(function(err) {
-            //     if (err) throw err;
-            //     var sql = theQuery;
-            //     con.query(sql, function (err, result) {
-            //     if (err) throw err;
-            //     console.log(result.affectedRows + " record(s) updated");
-            //     });
-            // });
-    //         console.log("The new stockQuantity is ", stockQuantity);
-    //         console.log("The updated JSON is as follows: ");
-    //         connection.query("SELECT * FROM products",
-    //             function(err,res){
-    //                 if (err) throw err;
-    //                 console.log(res);
-    // })
+    if (quanitityOrdered>stockQuantity){
+        console.log("Sorry, we do not have enough stock to place this order.");
+        console.log("You have ordered " + quanitityOrdered + " units, and we only have " + stockQuantity + " in our stock. Try either updating your order or ordering something else.");
+        getInput();
+    }
+    else{
+         var newTotal = stockQuantity - quanitityOrdered;
+            var theQuery = "UPDATE products SET stock_quantity =" + newTotal + " WHERE product_name= " + "'" +itemOrdered + "'";
+            connection.query(theQuery,
+                function(err,res){
+                    if (err) throw err;
+                    //console.log(res);
+                console.log("********************************************************************")  
+                console.log("CONGRATULATIONS! Your order went through.")
+                console.log("********************************************************************")  
 
-    // }
+                console.log("The new stockQuantity is ", newTotal);
+                console.log("The updated JSON is as follows: ");
+                    connection.query("SELECT * FROM products",
+                        function(err,res){
+                            if (err) throw err;
+                            console.log(res);
+                    })
+                connection.end();
+            })
+            
+    }
 
 
-    connection.end();
+  
 }
